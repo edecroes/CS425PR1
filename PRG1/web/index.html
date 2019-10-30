@@ -7,7 +7,55 @@ and open the template in the editor.
 <html>
     <body>
         <form action="http://localhost:8180/PRG1/registration">
+            <a href="http://localhost:8180/PRG1n">Search Registrations</a>
+            <a href="http://localhost:8180/PRG1/registration">Register Attendee</a>
         </form>
-        <div>To do write content</div>
+        <select>
+            <option value = "session1">Session 1</option>
+            <option value = "session2">Session 2</option>
+            <option value = "session3">Session 3</option>
+            <option value = "session4">Session 4</option>
+    </select>
+       <input type="button" value="input" onclick="input.selection();">
     </body>
 </html>
+
+
+var input = function () {
+return {
+
+selection : function (input){
+var current = this;
+var id = $("select").val();
+$.ajax({
+url : 'registration?code= ' + id,
+method: 'GET'
+datatype: 'html',
+success: function(response){
+that.output(response);}
+});
+};
+
+addToTable: function(firstName, lastName, sessionId){
+var current = this;
+var firstName = $("#firstName").val();
+var lastName = $("#lastName").val();
+var sessionId = $("#session").val();
+
+$.ajax({
+url: 'registration?code=' +firstName +";"+ lastName +";"+ sessionId,
+method: 'POST',
+dataType: 'json', 
+success: function(response){
+that.outputJSON(response);
+}
+});
+},
+output: function(response){
+$("#output").html(response);
+},
+outputJSON: function(response){
+$(#output).html("response["code"]);
+}
+};
+}());

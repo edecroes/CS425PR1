@@ -9,6 +9,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.*;
 /**
  *
  * @author edecroes
@@ -17,56 +27,76 @@ import java.sql.*;
 
 @WebServlet(name = "registration", urlPatterns = {"/registration"})
 public class registration extends HttpServlet {
-    
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet registration</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet registration at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-    
+     
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String firstName = request.getParameter("First Name");
-        String lastName = request.getParameter("Last Name");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        
+        Database db = null;
+        Connection connection;
+        PreparedStatement pstatement = null;
+        ResultSet resultset = null;
+        
+        String query;
+        String parameter;
+        String table = "";
+        //String firstName = request.getParameter("First Name");
+        //String lastName = request.getParameter("Last Name");
 
         //processRequest(request, response);
+        
+        boolean hasresults;
+        try{
+        //db = new Database();
+            connection = db.getConnection();
+
+            parameter = request.getParameter("search");
+            int parameterAgain = Integer.parseInt(parameter);
+            
+            query = "SELECT * FROM people WHERE lastname = ?";
+            
+            pstatement = connection.prepareStatement(query);
+            pstatement.setString(1, parameter);
+            
+            hasresults = pstatement.execute();
+            
+            while ( hasresults || pstatement.getUpdateCount() != -1 ) {
+                
+                if ( hasresults ) {
+                    resultset = pstatement.getResultSet();
+                    table += db.getResult(resultset);
+                }
+                
+                else {
+                    
+                    if ( pstatement.getUpdateCount() == -1 ) {
+                        break;
+                    }
+                    
+                }
+
+                hasresults = pstatement.getMoreResults();
+            
+            }
+
+            out.println("<p>Search Parameter: " + parameter + "</p>" + table);
+        }
+        
+        catch(Exception e){
+            System.out.println(e.toString());
+        }
+
+        
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        PrintWriter out = response.getWriter();
-        out.println("<table>");
-        out.println("<tr>");
-        out.println("<td> First Name: </td>");
-        out.println("<td><input type=""text"" name =""First Name""></td>"");
-        out.println("</tr>");
-        out.println("<tr>");
-        out.println("<td> Last Name: </td>");
-        out.println("<td><input type="text" name ="Last Name"></td>");
-        out.println("</tr>");
-        out.println("<tr>");
-        out.println("<td> How your name will be displayed: </td>");
-        out.println("<td><input type="text" name ="Name Display"></td>");
-        out.println("</tr>");
-        out.println("<tr>");
-        out.println("<td> Select Session: </td>");
-        out.println("<td><input type="text" name ="session"></td>");
-        out.println("</tr>");
-        out.println("</table>");
-        processRequest(request, response);
+        
+        doGet(request, response);
+        
     }
 
     @Override
