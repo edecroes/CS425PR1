@@ -1,35 +1,23 @@
 package edu.jsu.mcis.cs425.project1;
 
-import java.sql.ResultSetMetaData;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import javax.naming.Context;
-import javax.sql.DataSource;
-import java.sql.Driver;
-import static org.apache.tomcat.jni.User.username;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.ServletException;
 import javax.sql.DataSource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 public class Database{
+    
     public Connection getConnection(){
         
        Connection conn = null;
+       
         try {
             
             Context envContext = new InitialContext();
@@ -43,10 +31,79 @@ public class Database{
         return conn;
         
     }
+    
+    public String getRegistrationTable(int sessionid) {
+        
+        String result = "";
+        
+        try {
+        
+            Connection connection = getConnection();
+            
+            String query = "SELECT * FROM registrations WHERE sessionid = ?";
+            
+            PreparedStatement pstatement = connection.prepareStatement(query);
+            pstatement.setInt(1, sessionid);
+            
+            boolean hasresults = pstatement.execute();            
+                
+            if ( hasresults ) {
+                ResultSet resultset = pstatement.getResultSet();
+                result += getResultSetTable(resultset);
+            }
 
+        }
+        
+        catch (Exception e) { e.printStackTrace(); }
+        
+        return result;
+        
+    }
     
-    
-    public String getResult(ResultSet resultset) throws ServletException, IOException {
+    public String addRegistration(String fname, String lname, String dname, int sessionid) {
+        
+        String result = "";
+        
+        try {
+            
+            int key = 0;
+        
+            Connection connection = getConnection();
+            
+            String query = "INSERT INTO registrations (firstname, lastname, displayname, sessionid) VALUES (?, ?, ?, ?)";
+            
+            PreparedStatement pstatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+            pstatement.setString(1, fname);
+            pstatement.setString(2, lname);
+            pstatement.setString(3, dname);
+            pstatement.setInt(4, sessionid);
+            
+            int rows = pstatement.executeUpdate();
+            
+            if (rows == 1) {
+                ResultSet keys = pstatement.getGeneratedKeys();
+                if (keys.next()) {
+                    key = keys.getInt(1);
+                }
+            }
+            
+            JSONObject json = new JSONObject();
+            
+            json.put("displayname", dname);
+            json.put("code", ( "R" + String.format("%06d", key) ));
+            
+            result = JSONValue.toJSONString(json);
+
+        }
+        
+        catch (Exception e) { e.printStackTrace(); }
+        
+        return result;
+        
+    }
+
+
+    public String getResultSetTable(ResultSet resultset) throws ServletException, IOException {
         
         ResultSetMetaData metadata = null;
         
@@ -114,5 +171,6 @@ public class Database{
         
         return table;
         
-    } 
+    } // End getResultSetTable()
+
 }
