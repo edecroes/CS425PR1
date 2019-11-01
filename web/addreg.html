@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html>
+    
+    <head>
+        
+        <title>Project #1</title>
+        
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <script type="text/javascript" src="libraries/jquery-3.4.1.min.js"></script>
+        <script type="text/javascript" src="libraries/Project1.js"></script>        
+        
+    </head>
+    
+    <body>
+        
+        <p>
+            <a href="index.html">Search Attendees by Session</a>
+            <a href="addreg.html">Register New Attendee</a>
+        </p>
+        
+        <form name="regform" id="regform">
+            
+            <fieldset>
+                
+                <label for="firstname">First Name:</label>
+                <input type="text" id="firstname" name="firstname" class="namefields"><br />
+                
+                <label for="lastname">Last Name:</label>
+                <input type="text" id="lastname" name="lastname" class="namefields"><br />
+                
+                <label for="displayname">display Name:</label>
+                <input type="text" id="displayname" name="displayname"><br />
+                
+                <label for="sessionid">Session ID:</label>
+                
+                <select id="sessionid" name="sessionid">
+                    <option value = "1" selected>Session 1</option>
+                    <option value = "2">Session 2</option>
+                    <option value = "3">Session 3</option>
+                    <option value = "4">Session 4</option>
+                </select>                   
+                
+                <input type="button" value="Submit" onclick="Project1.submitRegForm();">
+                
+            </fieldset>
+            
+        </form>
+        
+        <div id="resultsarea">
+            
+            <p id="version"></p>
+            
+        </div>
+        
+        <script type="text/javascript">
+
+            $(document).ready( Project1.init );
+            $('.namefields').change( Project1.updateDisplayName );
+
+        </script>
+        
+    </body>
+    
+</html>
