@@ -37,18 +37,26 @@ var Project1 = ( function() {
 
                 success: function(response) {
 
-                    alert( JSON.stringify(response) );
+                    //alert( JSON.stringify(response) );
+                    
                     
                     var code = response["code"];
                     var displayname = response["displayname"];
                     
                     // Insert new paragraphs with the code and display name inside
+                    $("#version").html( "Registration code: " + code + "</br>" + "Display Name: " + displayname);
+
 
                 }
 
             });
             
         },
+
+        
+        
+        
+
         
         updateDisplayName: function() {
             

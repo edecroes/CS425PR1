@@ -44,6 +44,7 @@
                 </select>                   
                 
                 <input type="button" value="Submit" onclick="Project1.submitRegForm();">
+                       
                 
             </fieldset>
             
@@ -59,8 +60,10 @@
 
             $(document).ready( Project1.init );
             $('.namefields').change( Project1.updateDisplayName );
+            $(document).ready( Project1.submitRegForm );
 
-        </script>
+         </script>
+        
         
     </body>
     
